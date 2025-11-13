@@ -91,10 +91,14 @@ function reducer(state: GameState, action: GameAction): GameState {
       return createInitialState(state.difficulty);
 
     case 'SET_DIFFICULTY':
-      if (state.phase !== 'setup') {
-        return { ...state, difficulty: action.difficulty };
+      if (state.phase !== 'setup' || state.difficulty === action.difficulty) {
+        return state;
       }
-      return { ...createInitialState(action.difficulty) };
+      return {
+        ...state,
+        difficulty: action.difficulty,
+        aiMemory: ensureAIContext()
+      };
 
     case 'RANDOMIZE_PLAYER_FLEET': {
       const randomized = randomizeFleet(action.seed ?? Date.now());

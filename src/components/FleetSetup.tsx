@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { DEFAULT_SHIPS, SHIP_DEFS } from '../game/constants';
 import { placeShip, removeShip } from '../game/engine';
@@ -25,16 +25,12 @@ export function FleetSetup() {
     : remainingShips[0]?.id ?? null;
 
   useEffect(() => {
-    const handleKey = (event: KeyboardEvent) => {
-      if (event.key.toLowerCase() === 'r') {
-        event.preventDefault();
-        setOrientation(prev => (prev === 'horizontal' ? 'vertical' : 'horizontal'));
-      }
-    };
-
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, []);
+    if (!activeShip) return;
+    const placement = boardPlayer.ships.find(ship => ship.shipId === activeShip);
+    if (placement) {
+      setOrientation(prev => (prev === placement.orientation ? prev : placement.orientation));
+    }
+  }, [activeShip, boardPlayer.ships]);
 
   const handleRandomize = () => {
     dispatch({ type: 'RANDOMIZE_PLAYER_FLEET' });
@@ -48,9 +44,51 @@ export function FleetSetup() {
     setActiveShip(shipId);
   };
 
-  const handleRotate = () => {
-    setOrientation(prev => (prev === 'horizontal' ? 'vertical' : 'horizontal'));
-  };
+  const rotatePlacedShip = useCallback(
+    (shipId: ShipId, nextOrientation: Orientation): boolean => {
+      const placement = boardPlayer.ships.find(ship => ship.shipId === shipId);
+      if (!placement) return false;
+
+      const ship = SHIP_DEFS[shipId];
+      const clearedBoard = removeShip(boardPlayer, shipId);
+      try {
+        const updatedBoard = placeShip(clearedBoard, ship, placement.origin, nextOrientation);
+        dispatch({ type: 'SET_PLAYER_BOARD', payload: { board: updatedBoard } });
+        return true;
+      } catch (error) {
+        console.warn('Unable to rotate ship', error);
+        return false;
+      }
+    },
+    [boardPlayer, dispatch]
+  );
+
+  const handleRotate = useCallback(() => {
+    const nextOrientation: Orientation = orientation === 'horizontal' ? 'vertical' : 'horizontal';
+    const targetShip = activeShip ?? shipToPlace;
+    if (targetShip) {
+      const isPlaced = boardPlayer.ships.some(ship => ship.shipId === targetShip);
+      if (isPlaced) {
+        const rotated = rotatePlacedShip(targetShip, nextOrientation);
+        if (!rotated) {
+          return;
+        }
+      }
+    }
+    setOrientation(nextOrientation);
+  }, [orientation, activeShip, shipToPlace, boardPlayer.ships, rotatePlacedShip]);
+
+  useEffect(() => {
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() === 'r') {
+        event.preventDefault();
+        handleRotate();
+      }
+    };
+
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [handleRotate]);
 
   const handlePlaceShip = (coord: Coordinate) => {
     const targetShipId = activeShip ?? shipToPlace;

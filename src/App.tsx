@@ -1,4 +1,4 @@
-import { Fragment, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { BoardGrid } from './components/BoardGrid';
 import { DifficultyToggle } from './components/DifficultyToggle';
@@ -102,69 +102,72 @@ function GameLayout() {
       {phase === 'setup' ? (
         <FleetSetup />
       ) : (
-        <Fragment>
-          <section className="board-layout" aria-label="Battlefield">
-            <div className="panel" aria-label="Your ranch grid">
-              <h2>Ranch</h2>
-              <BoardGrid
-                board={playerBoardDisplay}
-                mode="player"
-                ariaLabel="Player ranch grid"
-                highlightTargets={viewingHistory ? undefined : aiTargetHints}
-                disabled={viewingHistory}
-              />
-            </div>
-            <div className="panel" aria-label="Outlaw waters grid">
-              <h2>Outlaw Waters</h2>
-              <BoardGrid
-                board={aiBoardDisplay}
-                mode="enemy"
-                ariaLabel="Outlaw grid"
-                onSelectCell={handlePlayerFire}
-                disabled={viewingHistory || phase !== 'playerTurn' || Boolean(winner)}
-              />
-            </div>
-          </section>
+        <section className="board-layout" aria-label="Battlefield">
+          <div className="panel" aria-label="Your ranch grid">
+            <h2>Ranch</h2>
+            <BoardGrid
+              board={playerBoardDisplay}
+              mode="player"
+              ariaLabel="Player ranch grid"
+              highlightTargets={viewingHistory ? undefined : aiTargetHints}
+              disabled={viewingHistory}
+            />
+          </div>
+          <div className="panel" aria-label="Outlaw waters grid">
+            <h2>Outlaw Waters</h2>
+            <BoardGrid
+              board={aiBoardDisplay}
+              mode="enemy"
+              ariaLabel="Outlaw grid"
+              onSelectCell={handlePlayerFire}
+              disabled={viewingHistory || phase !== 'playerTurn' || Boolean(winner)}
+            />
+          </div>
+        </section>
+      )}
 
-          <section className="panel history-panel" hidden={!isHistoryOpen} aria-hidden={!isHistoryOpen}>
-            <h2>Cattle Drive Log</h2>
-            <ol className="history-list">
-              {history.length === 0 && <li>No shots have been fired yet.</li>}
-              {history.map(entry => (
-                <li
-                  key={entry.timestamp}
-                  className={`history-entry${historyCursor === entry.turn ? ' history-entry--active' : ''}`}
-                >
-                  <div>
-                    <strong>Turn {entry.turn}:</strong> {entry.shooter === 'player' ? 'You' : 'AI'} →
-                    ({String.fromCharCode(65 + entry.target.y)}{entry.target.x + 1}) — {entry.result}
-                    {entry.sunk ? `, sunk ${entry.shipId}` : ''}
-                  </div>
-                  <button
-                    type="button"
-                    className="belt-buckle belt-buckle--ghost"
-                    onClick={() =>
-                      dispatch({ type: 'SET_HISTORY_CURSOR', payload: { turn: entry.turn } })
-                    }
-                    aria-pressed={historyCursor === entry.turn}
-                  >
-                    View
-                  </button>
-                </li>
-              ))}
-            </ol>
-            {historyCursor !== null && (
+      <section className="panel history-panel" hidden={!isHistoryOpen} aria-hidden={!isHistoryOpen}>
+        <h2>Cattle Drive Log</h2>
+        <p className="panel-footer" aria-live="polite">
+          {phase === 'setup'
+            ? 'History will fill in once the showdown starts. Place your ships to begin.'
+            : history.length === 0
+              ? 'No shots have been fired yet — take aim to rustle up entries.'
+              : `Logged turns: ${history.length}`}
+        </p>
+        <ol className="history-list">
+          {history.map(entry => (
+            <li
+              key={entry.timestamp}
+              className={`history-entry${historyCursor === entry.turn ? ' history-entry--active' : ''}`}
+            >
+              <div>
+                <strong>Turn {entry.turn}:</strong> {entry.shooter === 'player' ? 'You' : 'AI'} →
+                ({String.fromCharCode(65 + entry.target.y)}{entry.target.x + 1}) — {entry.result}
+                {entry.sunk ? `, sunk ${entry.shipId}` : ''}
+              </div>
               <button
                 type="button"
                 className="belt-buckle belt-buckle--ghost"
-                onClick={() => dispatch({ type: 'SET_HISTORY_CURSOR', payload: { turn: null } })}
+                onClick={() => dispatch({ type: 'SET_HISTORY_CURSOR', payload: { turn: entry.turn } })}
+                aria-pressed={historyCursor === entry.turn}
+                disabled={phase === 'setup'}
               >
-                Return to live battle
+                View
               </button>
-            )}
-          </section>
-        </Fragment>
-      )}
+            </li>
+          ))}
+        </ol>
+        {historyCursor !== null && (
+          <button
+            type="button"
+            className="belt-buckle belt-buckle--ghost"
+            onClick={() => dispatch({ type: 'SET_HISTORY_CURSOR', payload: { turn: null } })}
+          >
+            Return to live battle
+          </button>
+        )}
+      </section>
 
       {phase === 'finished' && (
         <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="Game result">
