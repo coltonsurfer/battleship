@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="138" height="46" viewBox="0 0 138 46">
+  <defs>
+    <style>
+      .burg { fill:#8b4153; }
+      .gold { fill:#c29b40; }
+      .cream { fill:#f5e4c3; }
+    </style>
+  </defs>
+
+  <!-- wagon base -->
+  <rect x="6" y="30" width="126" height="6" rx="3" class="burg"/>
+  <rect x="8" y="20" width="122" height="12" rx="4" class="burg"/>
+
+  <!-- covered top -->
+  <path class="cream" d="M16 12
+    h106
+    c2 0 4 2 4 4
+    v6
+    h-114
+    v-6
+    c0-2 2-4 4-4z"/>
+  <!-- ribs -->
+  <rect x="30" y="12" width="6" height="10" class="burg" opacity="0.25"/>
+  <rect x="64" y="12" width="6" height="10" class="burg" opacity="0.25"/>
+  <rect x="98" y="12" width="6" height="10" class="burg" opacity="0.25"/>
+
+  <!-- cowboy hat -->
+  <g transform="translate(48,2)">
+    <ellipse cx="21" cy="12" rx="24" ry="6" class="burg"/>
+    <path class="gold" d="M8 8 c3-6 12-8 21-8 s18 2 21 8 v4 h-42 z"/>
+    <rect x="18" y="6" width="18" height="10" rx="4" class="burg"/>
+  </g>
+
+  <!-- decorative lines on wagon body -->
+  <rect x="16" y="24" width="28" height="3" class="gold" rx="1.5"/>
+  <rect x="54" y="24" width="28" height="3" class="gold" rx="1.5"/>
+  <rect x="92" y="24" width="28" height="3" class="gold" rx="1.5"/>
+
+  <!-- wheels -->
+  <circle cx="36" cy="38" r="7" class="burg"/>
+  <circle cx="36" cy="38" r="3" class="gold"/>
+  <circle cx="102" cy="38" r="7" class="burg"/>
+  <circle cx="102" cy="38" r="3" class="gold"/>
+</svg>

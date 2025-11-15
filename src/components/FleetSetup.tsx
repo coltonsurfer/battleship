@@ -91,6 +91,13 @@ export function FleetSetup() {
   }, [handleRotate]);
 
   const handlePlaceShip = (coord: Coordinate) => {
+    // Check if clicking on an existing ship to select it
+    const cell = boardPlayer.grid[coord.y][coord.x];
+    if (cell.status === 'ship') {
+      setActiveShip(cell.shipId);
+      return;
+    }
+
     const targetShipId = activeShip ?? shipToPlace;
     if (!targetShipId) return;
     const ship = SHIP_DEFS[targetShipId];
@@ -110,11 +117,11 @@ export function FleetSetup() {
   const isReady = boardPlayer.ships.length === DEFAULT_SHIPS.length;
 
   return (
-    <div className="panel" aria-label="Fleet placement" role="region">
+    <div id="fleet" className="panel" aria-label="Fleet placement" role="region">
       <header>
         <h2>Ranch Setup</h2>
         <p className="header-subtitle">
-          Select a ship, then click the grid to place it. Tap the rotate button or press <kbd>R</kbd>.
+          Select a ship, then click the grid to place it. Click on placed ships to select them for rotation. Tap the rotate button or press <kbd>R</kbd>.
         </p>
       </header>
 

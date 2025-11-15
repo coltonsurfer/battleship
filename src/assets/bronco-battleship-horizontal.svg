@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100" preserveAspectRatio="none">
+  <!-- Bronco Battleship - 4 cells horizontal -->
+  <defs>
+    <linearGradient id="broncoGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#A0522D;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6B4423;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Main hull -->
+  <path d="M 20 50 L 380 50 L 390 70 L 10 70 Z" fill="url(#broncoGrad)" stroke="#3E2723" stroke-width="3"/>
+  
+  <!-- Deck -->
+  <rect x="30" y="30" width="340" height="20" rx="5" fill="#8B6914" stroke="#3E2723" stroke-width="2"/>
+  
+  <!-- Cannons -->
+  <circle cx="100" cy="40" r="8" fill="#2C2C2C" stroke="#000" stroke-width="2"/>
+  <circle cx="200" cy="40" r="8" fill="#2C2C2C" stroke="#000" stroke-width="2"/>
+  <circle cx="300" cy="40" r="8" fill="#2C2C2C" stroke="#000" stroke-width="2"/>
+  
+  <!-- Horse head -->
+  <text x="350" y="35" font-size="28" fill="#654321">🐴</text>
+  
+  <!-- Portholes -->
+  <circle cx="80" cy="60" r="5" fill="#4A4A4A" stroke="#000" stroke-width="1"/>
+  <circle cx="150" cy="60" r="5" fill="#4A4A4A" stroke="#000" stroke-width="1"/>
+  <circle cx="220" cy="60" r="5" fill="#4A4A4A" stroke="#000" stroke-width="1"/>
+  <circle cx="290" cy="60" r="5" fill="#4A4A4A" stroke="#000" stroke-width="1"/>
+</svg>

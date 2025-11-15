@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 100" preserveAspectRatio="none">
+  <!-- Stampede Sub - 3 cells horizontal -->
+  <defs>
+    <linearGradient id="subGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B7355;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#5C4033;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Main submarine body -->
+  <ellipse cx="150" cy="50" rx="140" ry="25" fill="url(#subGrad)" stroke="#3E2723" stroke-width="3"/>
+  
+  <!-- Periscope -->
+  <rect x="145" y="15" width="10" height="25" rx="2" fill="#654321" stroke="#3E2723" stroke-width="2"/>
+  <circle cx="150" cy="12" r="6" fill="#4A4A4A" stroke="#000" stroke-width="1"/>
+  
+  <!-- Bull horns on periscope -->
+  <path d="M 145 12 Q 135 8 130 10" fill="none" stroke="#654321" stroke-width="2"/>
+  <path d="M 155 12 Q 165 8 170 10" fill="none" stroke="#654321" stroke-width="2"/>
+  
+  <!-- Portholes with cattle -->
+  <circle cx="80" cy="50" r="12" fill="#87CEEB" stroke="#3E2723" stroke-width="2"/>
+  <text x="72" y="58" font-size="16" fill="#654321">🐂</text>
+  
+  <circle cx="150" cy="50" r="12" fill="#87CEEB" stroke="#3E2723" stroke-width="2"/>
+  <text x="142" y="58" font-size="16" fill="#654321">🐂</text>
+  
+  <circle cx="220" cy="50" r="12" fill="#87CEEB" stroke="#3E2723" stroke-width="2"/>
+  <text x="212" y="58" font-size="16" fill="#654321">🐂</text>
+  
+  <!-- Propeller -->
+  <ellipse cx="280" cy="50" rx="8" ry="20" fill="#8B4513" stroke="#3E2723" stroke-width="2"/>
+</svg>

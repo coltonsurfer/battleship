@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="230" height="46" viewBox="0 0 230 46">
+  <defs>
+    <style>
+      .burg { fill:#8b4153; }
+      .gold { fill:#c29b40; }
+      .cream { fill:#f5e4c3; }
+    </style>
+    <g id="cow">
+      <path class="burg" d="M0 12
+        c2-5 8-9 16-9
+        c7 0 15 4 19 9
+        c2 2 3 4 3 6
+        c0 2-1 3-3 3
+        h-4 v6 h-5 v-6
+        h-7 v6 h-5 v-6
+        h-4 c-3 0-5-2-5-4
+        c0-2 1-4 5-5 z
+        m26-6 c2 0 4 2 4 4 s-2 4-4 4 s-4-2-4-4 2-4 4-4z"/>
+    </g>
+  </defs>
+
+  <rect x="10" y="32" width="210" height="6" rx="3" class="burg"/>
+  <rect x="8" y="8" width="214" height="20" rx="6" class="burg"/>
+  <rect x="18" y="18" width="194" height="4" class="cream" opacity="0.35"/>
+
+  <rect x="16" y="12" width="30" height="14" rx="2" class="gold"/>
+  <rect x="52" y="12" width="30" height="14" rx="2" class="gold"/>
+  <rect x="88" y="12" width="30" height="14" rx="2" class="gold"/>
+  <rect x="124" y="12" width="30" height="14" rx="2" class="gold"/>
+  <rect x="160" y="12" width="30" height="14" rx="2" class="gold"/>
+
+  <g transform="translate(20,10) scale(0.6)"><use href="#cow"/></g>
+  <g transform="translate(56,10) scale(0.6)"><use href="#cow"/></g>
+  <g transform="translate(92,10) scale(0.6)"><use href="#cow"/></g>
+  <g transform="translate(128,10) scale(0.6)"><use href="#cow"/></g>
+  <g transform="translate(164,10) scale(0.6)"><use href="#cow"/></g>
+
+  <circle cx="48" cy="38" r="8" class="burg"/>
+  <circle cx="48" cy="38" r="3" class="gold"/>
+  <circle cx="182" cy="38" r="8" class="burg"/>
+  <circle cx="182" cy="38" r="3" class="gold"/>
+</svg>

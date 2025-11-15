@@ -1,8 +1,10 @@
 import { useMemo } from 'react';
 
 import { BoardGrid } from './components/BoardGrid';
+import { CowboyNav } from './components/CowboyNav';
 import { DifficultyToggle } from './components/DifficultyToggle';
 import { FleetSetup } from './components/FleetSetup';
+import { ArsenalShowcase } from './components/ArsenalShowcase';
 import { GameProvider, useGame } from './context/GameContext';
 import { getHistoryAtTurn } from './game/history';
 
@@ -65,14 +67,48 @@ function GameLayout() {
 
   const toggleHistory = () => dispatch({ type: 'TOGGLE_HISTORY' });
 
+  const handleQuickDraw = () => {
+    if (phase !== 'setup') {
+      handleNewGame();
+      return;
+    }
+    dispatch({ type: 'RANDOMIZE_PLAYER_FLEET', seed: Date.now() });
+    setTimeout(() => dispatch({ type: 'START_GAME' }), 0);
+  };
+
   return (
     <div className="app-shell">
+      <CowboyNav onQuickDraw={handleQuickDraw} />
+
       <header className="app-header">
-        <h1>Cattle Clash</h1>
-        <p className="header-subtitle">Battleship on the open range — rustle up those outlaws.</p>
+        <div className="hero-content">
+          <div className="hero-badge">
+            <span>⚔️ WESTERN NAVAL WARFARE ⚔️</span>
+          </div>
+          <h1 className="hero-title">
+            <span className="hero-title__main">Cattle</span>
+            <span className="hero-title__accent">Clash</span>
+          </h1>
+          <p className="hero-subtitle">
+            Battleship on the open range — rustle up those outlaws.
+          </p>
+          <div className="hero-actions">
+            <button className="hero-cta hero-cta--primary" onClick={handleQuickDraw}>
+              {phase !== 'setup' ? '⚡ New Battle' : '🤠 Quick Draw'}
+            </button>
+            <button className="hero-cta hero-cta--secondary" onClick={toggleHistory}>
+              {isHistoryOpen ? '📋 Hide Battle Log' : `📋 Cattle Drive Log (${history.length})`}
+            </button>
+          </div>
+        </div>
+        <div className="hero-background">
+          <div className="hero-particles"></div>
+        </div>
       </header>
 
-      <section className="panel" aria-live="polite">
+      <ArsenalShowcase />
+
+      <section id="controls" className="panel" aria-live="polite">
         <div className="control-bar">
           <DifficultyToggle
             difficulty={difficulty}
@@ -102,7 +138,7 @@ function GameLayout() {
       {phase === 'setup' ? (
         <FleetSetup />
       ) : (
-        <section className="board-layout" aria-label="Battlefield">
+        <section id="arena" className="board-layout" aria-label="Battlefield">
           <div className="panel" aria-label="Your ranch grid">
             <h2>Ranch</h2>
             <BoardGrid
@@ -126,7 +162,7 @@ function GameLayout() {
         </section>
       )}
 
-      <section className="panel history-panel" hidden={!isHistoryOpen} aria-hidden={!isHistoryOpen}>
+      <section id="log" className="panel history-panel" hidden={!isHistoryOpen} aria-hidden={!isHistoryOpen}>
         <h2>Cattle Drive Log</h2>
         <p className="panel-footer" aria-live="polite">
           {phase === 'setup'

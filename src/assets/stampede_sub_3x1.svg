@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="138" height="46" viewBox="0 0 138 46">
+  <defs>
+    <style>
+      .burg { fill:#8b4153; }
+      .gold { fill:#c29b40; }
+      .cream { fill:#f5e4c3; }
+    </style>
+  </defs>
+
+  <!-- Submarine body shaped like a bull -->
+  <path class="burg" d="M6 26
+    c4-10 20-16 36-16
+    h44
+    c10 0 26 6 30 16
+    v4
+    c-4 10-20 16-36 16
+    h-44
+    c-10 0-26-6-30-16
+    z"/>
+    
+  <!-- Horns -->
+  <path class="gold" d="M6 26
+    c-2-4-2-8 2-10
+    s6 0 8 4
+    l-2 6 z"/>
+  <path class="gold" d="M132 26
+    c2-4 2-8-2-10
+    s-6 0-8 4
+    l2 6 z"/>
+
+  <!-- Portholes -->
+  <circle cx="46" cy="26" r="4" class="cream"/>
+  <circle cx="69" cy="26" r="4" class="cream"/>
+  <circle cx="92" cy="26" r="4" class="cream"/>
+
+  <!-- Periscope -->
+  <rect x="64" y="6" width="6" height="10" class="gold"/>
+  <rect x="60" y="4" width="14" height="3" rx="1.5" class="gold"/>
+
+  <!-- Tail fin -->
+  <polygon points="122,26 132,20 132,32" class="burg"/>
+
+  <!-- Decorative belly stripe -->
+  <rect x="16" y="32" width="106" height="3" class="gold" opacity="0.5"/>
+</svg>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="92" height="46" viewBox="0 0 92 46">
+  <defs>
+    <style>
+      .burg { fill:#8b4153; }
+      .gold { fill:#c29b40; }
+      .cream { fill:#f5e4c3; }
+      .rope { fill:none; stroke:#c29b40; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
+    </style>
+  </defs>
+
+  <!-- Base ship shape -->
+  <rect x="6" y="26" width="80" height="8" rx="3" class="burg"/>
+  <rect x="4" y="18" width="84" height="10" rx="5" class="burg"/>
+
+  <!-- Rope pattern across top -->
+  <path class="rope" d="M8 22 q10-6 20 0 t20 0 t20 0 t20 0"/>
+  <path class="rope" d="M8 20 q10-8 20 0 t20 0 t20 0 t20 0" opacity="0.4"/>
+
+  <!-- Lasso coils on each end -->
+  <circle cx="10" cy="23" r="7" class="rope"/>
+  <circle cx="82" cy="23" r="7" class="rope"/>
+
+  <!-- Cannon made of rope -->
+  <path class="rope" d="M46 18 l0 -6 q0 -4 6 -4 h4" />
+  <circle cx="58" cy="8" r="3" class="burg"/>
+
+  <!-- Wheels or base details -->
+  <circle cx="28" cy="38" r="6" class="burg"/>
+  <circle cx="28" cy="38" r="2" class="gold"/>
+  <circle cx="64" cy="38" r="6" class="burg"/>
+  <circle cx="64" cy="38" r="2" class="gold"/>
+</svg>
