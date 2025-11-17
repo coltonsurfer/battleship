@@ -1,12 +1,14 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef, useState } from 'react';
 
 import { BoardGrid } from './components/BoardGrid';
 import { CowboyNav } from './components/CowboyNav';
 import { DifficultyToggle } from './components/DifficultyToggle';
 import { FleetSetup } from './components/FleetSetup';
 import { ArsenalShowcase } from './components/ArsenalShowcase';
+import { AiThinkingMap } from './components/AiThinkingMap';
 import { GameProvider, useGame } from './context/GameContext';
 import { getHistoryAtTurn } from './game/history';
+import { audioManager } from './utils/audio';
 
 function GameLayout() {
   const { state, dispatch } = useGame();
@@ -52,6 +54,52 @@ function GameLayout() {
       } (${lastEntry.result}${lastEntry.sunk ? `, sunk ${lastEntry.shipId}` : ''})`
     : 'No shots yet — saddle up!';
 
+  // Track previous history length to detect new shots
+  const prevHistoryLengthRef = useRef(history.length);
+  const [audioEnabled, setAudioEnabled] = useState(true);
+
+  // Update audio manager when enabled state changes
+  useEffect(() => {
+    audioManager.setEnabled(audioEnabled);
+  }, [audioEnabled]);
+
+  // Play entrance sound on mount
+  useEffect(() => {
+    audioManager.playEntrance();
+  }, []);
+
+  // Play victory/defeat sound when game ends
+  useEffect(() => {
+    if (phase === 'finished' && winner) {
+      if (winner === 'player') {
+        audioManager.playVictory();
+      } else {
+        audioManager.playDefeat();
+      }
+    }
+  }, [phase, winner]);
+
+  // Play shot sounds when history updates
+  useEffect(() => {
+    if (history.length > prevHistoryLengthRef.current) {
+      const latestShot = history[history.length - 1];
+      
+      // Play fire sound first
+      audioManager.playFire();
+      
+      // Then play hit or miss sound after a short delay
+      setTimeout(() => {
+        if (latestShot.result === 'hit') {
+          audioManager.playHit();
+        } else {
+          audioManager.playMiss();
+        }
+      }, 150);
+    }
+    
+    prevHistoryLengthRef.current = history.length;
+  }, [history]);
+
   const handlePlayerFire = (coordinate: { x: number; y: number }) => {
     try {
       if (viewingHistory || phase !== 'playerTurn' || winner) return;
@@ -79,6 +127,9 @@ function GameLayout() {
   return (
     <div className="app-shell">
       <CowboyNav onQuickDraw={handleQuickDraw} />
+
+      {/* AI Thinking Map Animation */}
+      {aiThinking && phase === 'aiTurn' && <AiThinkingMap />}
 
       <header className="app-header">
         <div className="hero-content">
@@ -120,6 +171,14 @@ function GameLayout() {
           </button>
           <button className="belt-buckle" type="button" onClick={toggleHistory}>
             {isHistoryOpen ? 'Hide cattle drive log' : `Cattle drive log (${history.length})`}
+          </button>
+          <button 
+            className="belt-buckle belt-buckle--ghost" 
+            type="button" 
+            onClick={() => setAudioEnabled(!audioEnabled)}
+            aria-label={audioEnabled ? 'Mute audio' : 'Unmute audio'}
+          >
+            {audioEnabled ? '🔊 Audio On' : '🔇 Audio Off'}
           </button>
         </div>
         <div className="status-banner">

@@ -65,7 +65,7 @@ function renderCellContent(cell: CellState, mode: BoardMode) {
     if (cell.status === 'miss') return '○';
     if (cell.status === 'sunk') return '✶';
   } else {
-    if (cell.status === 'ship') return '⇔';
+    // Enemy mode: only show hits, misses, and sunk ships - hide intact ships
     if (cell.status === 'hit') return '☒';
     if (cell.status === 'miss') return '○';
     if (cell.status === 'sunk') return '✶';

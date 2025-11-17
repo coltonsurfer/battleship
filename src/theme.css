@@ -23,7 +23,7 @@
 }
 
 :root {
-  --bg-main: #22140d;
+  --bg-main: #1d2c3a;
   --bg-panel: #372319;
   --bg-grid-tile: rgba(77, 50, 33, 0.7);
   --text-primary: #f8f1e5;
@@ -50,7 +50,7 @@ html,
 body {
   margin: 0;
   min-height: 100%;
-  background: radial-gradient(circle at top, #4a2f21, #140b06 60%, #0b0503 100%);
+  background: radial-gradient(circle at top, #1d2c3a, #0a1419 60%, #060d12 100%);
   color: var(--text-primary);
   font-family: var(--font-family);
 }

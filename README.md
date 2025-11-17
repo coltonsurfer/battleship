@@ -1,3 +1,62 @@
+# Cattle Clash - Western Battleship
+
+A western-themed battleship game with cowboy aesthetics and immersive audio.
+
+## Features
+
+### Game Modes & Difficulty
+- **Easy Mode**: Random shot selection
+- **Medium Mode**: Uses parity/checkerboard pattern for efficient searching
+- **Hard Mode**: **SUPER CHALLENGING** - Advanced AI with:
+  - Probability-based heatmap targeting
+  - Ship-length weighted calculations
+  - Pattern recognition and line detection
+  - Strategic center-board prioritization
+  - Aggressive hunt mode with 50x bonus for adjacent hits
+  - Intelligent line-following when ships are detected
+  - Checkerboard optimization for maximum efficiency
+
+### Audio System
+The game includes a complete western-themed audio system using the Web Audio API:
+
+- **Entrance Theme**: Triumphant western chord progression when entering the game
+- **Gunshot Sounds**: Sharp gunshot effects when firing at enemy ships
+- **Hit Sounds**: Metallic clang when successfully hitting a ship
+- **Miss Sounds**: Water splash effects when missing
+- **Victory/Defeat**: Celebratory or somber tunes when the game ends
+
+**Audio Controls**: Use the 🔊/🔇 button in the control panel to toggle audio on/off.
+
+### Typography
+- **Hero Title**: Rye font for authentic western branding
+- **Headers**: Cinzel font for elegant section headers
+- **Body Text**: Roboto Slab for comfortable readability
+
+### Visual Design
+- Modern gaming hero section with gradient backgrounds
+- Animated particle effects
+- Real-time ship status tracking in Arsenal Showcase
+- Ship sprites with damage indicators
+- **Western Map Animation**: Vintage paper map with compass rose and radar-style scanning while AI is thinking
+
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Run tests
+npm test
+```
+
+---
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

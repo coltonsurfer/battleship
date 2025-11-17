@@ -148,18 +148,39 @@ function collectMisses(board: BoardState): Coordinate[] {
 }
 
 function prioritiseHotCells(candidates: Coordinate[], hits: Coordinate[], board: BoardState): Coordinate[] {
-  if (hits.length === 0) return candidates;
-  const hitSet = new Set(hits.map(serialize));
-  return candidates.sort((a, b) => {
-    const aAdj = getNeighbourCoords(a, board.size).some(n => hitSet.has(serialize(n))) ? 1 : 0;
-    const bAdj = getNeighbourCoords(b, board.size).some(n => hitSet.has(serialize(n))) ? 1 : 0;
-    if (aAdj === bAdj) {
+  if (hits.length === 0) {
+    // For hard mode: prioritize center cells and high-value positions
+    return candidates.sort((a, b) => {
       const center = (board.size - 1) / 2;
       const aDist = Math.abs(a.x - center) + Math.abs(a.y - center);
       const bDist = Math.abs(b.x - center) + Math.abs(b.y - center);
       return aDist - bDist;
+    });
+  }
+  
+  const hitSet = new Set(hits.map(serialize));
+  return candidates.sort((a, b) => {
+    // Prioritize cells adjacent to hits
+    const aAdj = getNeighbourCoords(a, board.size).filter(n => hitSet.has(serialize(n))).length;
+    const bAdj = getNeighbourCoords(b, board.size).filter(n => hitSet.has(serialize(n))).length;
+    
+    if (aAdj !== bAdj) {
+      return bAdj - aAdj;
     }
-    return bAdj - aAdj;
+    
+    // Secondary: prefer cells that align with hit patterns
+    const aAligned = hits.some(h => h.x === a.x || h.y === a.y) ? 1 : 0;
+    const bAligned = hits.some(h => h.x === b.x || h.y === b.y) ? 1 : 0;
+    
+    if (aAligned !== bAligned) {
+      return bAligned - aAligned;
+    }
+    
+    // Tertiary: prefer center positions
+    const center = (board.size - 1) / 2;
+    const aDist = Math.abs(a.x - center) + Math.abs(a.y - center);
+    const bDist = Math.abs(b.x - center) + Math.abs(b.y - center);
+    return aDist - bDist;
   });
 }
 
@@ -168,17 +189,56 @@ export function pickHardShot(board: BoardState, ctx: AIMemory): AIShotResult {
   const misses = collectMisses(board);
   const heatmap = createEmptyHeatmap(board.size);
 
+  // Build probability heatmap based on all possible ship placements
   for (const shipId of board.remainingShips) {
     const ship = SHIP_DEFS[shipId];
-    for (const placement of enumeratePlacements(ship, board, hits, misses)) {
+    const placements = enumeratePlacements(ship, board, hits, misses);
+    
+    // Weight longer ships more heavily (they're harder to hide)
+    const weight = ship.length;
+    
+    for (const placement of placements) {
       placement.forEach(({ x, y }) => {
         if (!ctx.attempted.has(serialize({ x, y }))) {
-          heatmap[y][x] += 1;
+          heatmap[y][x] += weight;
         }
       });
     }
   }
 
+  // Apply additional strategic bonuses
+  for (let y = 0; y < heatmap.length; y += 1) {
+    for (let x = 0; x < heatmap[y].length; x += 1) {
+      const key = serialize({ x, y });
+      if (ctx.attempted.has(key)) continue;
+      
+      // Bonus for cells adjacent to hits (hunt mode)
+      const adjacentHits = getNeighbourCoords({ x, y }, board.size)
+        .filter(n => hits.some(h => h.x === n.x && h.y === n.y))
+        .length;
+      heatmap[y][x] += adjacentHits * 50; // Heavy bonus for adjacent cells
+      
+      // Bonus for cells that form lines with existing hits
+      const lineBonus = hits.filter(h => 
+        (h.x === x && Math.abs(h.y - y) <= 2) || 
+        (h.y === y && Math.abs(h.x - x) <= 2)
+      ).length;
+      heatmap[y][x] += lineBonus * 30;
+      
+      // Bonus for center positions (ships more likely in center)
+      const center = (board.size - 1) / 2;
+      const distFromCenter = Math.abs(x - center) + Math.abs(y - center);
+      const centerBonus = Math.max(0, 10 - distFromCenter);
+      heatmap[y][x] += centerBonus;
+      
+      // Bonus for parity pattern (checkerboard optimization)
+      if ((x + y) % 2 === 0) {
+        heatmap[y][x] += 5;
+      }
+    }
+  }
+
+  // Find all cells with the highest probability
   let candidates: Coordinate[] = [];
   let bestScore = -1;
   for (let y = 0; y < heatmap.length; y += 1) {
@@ -199,6 +259,7 @@ export function pickHardShot(board: BoardState, ctx: AIMemory): AIShotResult {
     return pickMediumShot(board, ctx);
   }
 
+  // Use advanced prioritization to break ties
   const prioritised = prioritiseHotCells(candidates, hits, board);
   const coord = prioritised[0];
   ctx.attempted.add(serialize(coord));
