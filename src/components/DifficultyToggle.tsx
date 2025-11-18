@@ -1,4 +1,5 @@
 import type { Difficulty } from '../game/types';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface DifficultyToggleProps {
   difficulty: Difficulty;
@@ -6,15 +7,17 @@ interface DifficultyToggleProps {
   disabled?: boolean;
 }
 
-const options: { label: string; value: Difficulty; description: string }[] = [
-  { label: 'Easy', value: 'easy', description: 'Spray & pray shots — purely random.' },
-  { label: 'Medium', value: 'medium', description: 'Hunt & target after a hit.' },
-  { label: 'Hard', value: 'hard', description: 'Probability-driven sharpshooter.' }
-];
-
 export function DifficultyToggle({ difficulty, onChange, disabled }: DifficultyToggleProps) {
+  const { t } = useTranslation();
+  
+  const options: { label: string; value: Difficulty; description: string }[] = [
+    { label: t('difficulty.easy'), value: 'easy', description: t('difficulty.easy.description') },
+    { label: t('difficulty.medium'), value: 'medium', description: t('difficulty.medium.description') },
+    { label: t('difficulty.hard'), value: 'hard', description: t('difficulty.hard.description') }
+  ];
+  
   return (
-    <div className="difficulty-toggle" role="group" aria-label="AI difficulty">
+    <div className="difficulty-toggle" role="group" aria-label={t('difficulty.label')}>
       {options.map(option => (
         <button
           key={option.value}

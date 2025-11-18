@@ -60,6 +60,7 @@ export interface AIMemory {
 export interface GameState {
   phase: Phase;
   difficulty: Difficulty;
+  language: 'en' | 'es';
   boardPlayer: BoardState;
   boardAI: BoardState;
   initialBoardPlayer?: BoardState;

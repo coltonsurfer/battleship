@@ -1,4 +1,5 @@
 import { useGame } from '../context/GameContext';
+import { useTranslation } from '../hooks/useTranslation';
 import { SHIP_DEFS } from '../game/constants';
 import type { ShipId } from '../game/types';
 
@@ -16,60 +17,49 @@ const SHIP_SPRITES: Record<ShipId, string> = {
   destroyer: lassoDestroyerIcon
 };
 
-const SHIP_DESCRIPTIONS: Record<ShipId, { description: string; metrics: Array<{ label: string; value: string }> }> = {
-  carrier: {
-    description: 'A massive vessel that dominates the waterways. The largest ship in your fleet.',
-    metrics: [
-      { label: 'Size', value: '5' },
-      { label: 'Armor', value: '★★☆' }
-    ]
-  },
-  battleship: {
-    description: 'A powerful warship with heavy firepower. The backbone of any naval fleet.',
-    metrics: [
-      { label: 'Size', value: '4' },
-      { label: 'Power', value: '★★★' }
-    ]
-  },
-  cruiser: {
-    description: 'Fast and versatile vessel perfect for quick strikes and reconnaissance.',
-    metrics: [
-      { label: 'Size', value: '3' },
-      { label: 'Speed', value: '★★★' }
-    ]
-  },
-  submarine: {
-    description: 'Stealthy underwater predator. Can strike from unexpected angles.',
-    metrics: [
-      { label: 'Size', value: '3' },
-      { label: 'Stealth', value: '★★★' }
-    ]
-  },
-  destroyer: {
-    description: 'Small but deadly craft. Excellent for hit-and-run tactics.',
-    metrics: [
-      { label: 'Size', value: '2' },
-      { label: 'Agility', value: '★★★' }
-    ]
-  }
+const SHIP_METRIC_VALUES: Record<ShipId, Array<{ metricKey: string; value: string }>> = {
+  carrier: [
+    { metricKey: 'armor', value: '★★☆' }
+  ],
+  battleship: [
+    { metricKey: 'power', value: '★★★' }
+  ],
+  cruiser: [
+    { metricKey: 'speed', value: '★★★' }
+  ],
+  submarine: [
+    { metricKey: 'stealth', value: '★★★' }
+  ],
+  destroyer: [
+    { metricKey: 'agility', value: '★★★' }
+  ]
 };
 
 export function ArsenalShowcase() {
   const { state } = useGame();
   const { boardPlayer } = state;
+  const { t } = useTranslation();
   
   // Get ships that are actually placed on the board
   const placedShips = boardPlayer.ships.map(shipPlacement => {
     const shipDef = SHIP_DEFS[shipPlacement.shipId];
-    const shipInfo = SHIP_DESCRIPTIONS[shipPlacement.shipId];
+    const metricValues = SHIP_METRIC_VALUES[shipPlacement.shipId];
     const sprite = SHIP_SPRITES[shipPlacement.shipId];
+    
+    const metrics = [
+      { label: t('ship.metric.size'), value: String(shipDef.length) },
+      ...metricValues.map(m => ({ 
+        label: t(`ship.metric.${m.metricKey}` as any), 
+        value: m.value 
+      }))
+    ];
     
     return {
       id: shipPlacement.shipId,
-      title: shipDef.displayName,
+      title: t(`ship.${shipPlacement.shipId}` as any),
       icon: sprite,
-      description: shipInfo.description,
-      metrics: shipInfo.metrics,
+      description: t(`ship.${shipPlacement.shipId}.description` as any),
+      metrics,
       state: shipPlacement.sunk ? 'sunk' : shipPlacement.hits.length > 0 ? 'damaged' : 'normal',
       hits: shipPlacement.hits.length,
       totalHits: shipPlacement.length
@@ -81,15 +71,19 @@ export function ArsenalShowcase() {
     target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  const shipsReadyText = placedShips.length === 1 
+    ? t('arsenal.shipsReady', { count: '' })
+    : t('arsenal.shipsReady', { count: 's' });
+  
   return (
     <section className="arsenal-section" aria-labelledby="arsenal-heading" data-node-id="1:4">
       <div className="arsenal-section__header">
-        <p className="arsenal-eyebrow">Your Fleet</p>
-        <h2 id="arsenal-heading">Deployed Ships</h2>
+        <p className="arsenal-eyebrow">{t('arsenal.eyebrow')}</p>
+        <h2 id="arsenal-heading">{t('arsenal.heading')}</h2>
         <p>
           {placedShips.length === 0 
-            ? "No ships deployed yet. Place your fleet to begin battle."
-            : `${placedShips.length} ship${placedShips.length !== 1 ? 's' : ''} ready for combat`
+            ? t('arsenal.noShips')
+            : `${placedShips.length} ${shipsReadyText}`
           }
         </p>
       </div>
@@ -117,9 +111,9 @@ export function ArsenalShowcase() {
               <div className="arsenal-card__title">
                 <h3>{ship.title}</h3>
                 <span className="arsenal-card__status">
-                  {ship.state === 'sunk' ? '☒ Sunk' : 
-                   ship.state === 'damaged' ? `⚠️ Damaged (${ship.hits}/${ship.totalHits})` : 
-                   '✓ Ready'}
+                  {ship.state === 'sunk' ? t('arsenal.status.sunk') : 
+                   ship.state === 'damaged' ? `${t('arsenal.status.damaged')} (${ship.hits}/${ship.totalHits})` : 
+                   t('arsenal.status.ready')}
                 </span>
               </div>
               <p className="arsenal-card__body">{ship.description}</p>
@@ -132,7 +126,7 @@ export function ArsenalShowcase() {
                   </div>
                 ))}
                 <div>
-                  <dt>Damage</dt>
+                  <dt>{t('arsenal.damage')}</dt>
                   <dd>{ship.hits}/{ship.totalHits}</dd>
                 </div>
               </dl>
@@ -141,12 +135,12 @@ export function ArsenalShowcase() {
         </ul>
       ) : (
         <div className="arsenal-empty">
-          <p>Your fleet awaits deployment. Start placing ships to see them here.</p>
+          <p>{t('arsenal.awaitingDeployment')}</p>
         </div>
       )}
 
       <button type="button" className="arsenal-cta" onClick={handleViewFull}>
-        {placedShips.length > 0 ? 'View Fleet Status' : 'Start Deployment'}
+        {placedShips.length > 0 ? t('arsenal.viewFleetStatus') : t('arsenal.startDeployment')}
       </button>
     </section>
   );

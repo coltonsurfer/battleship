@@ -3,15 +3,18 @@ import { useMemo, useEffect, useRef, useState } from 'react';
 import { BoardGrid } from './components/BoardGrid';
 import { CowboyNav } from './components/CowboyNav';
 import { DifficultyToggle } from './components/DifficultyToggle';
+import { LanguageToggle } from './components/LanguageToggle';
 import { FleetSetup } from './components/FleetSetup';
 import { ArsenalShowcase } from './components/ArsenalShowcase';
 import { AiThinkingMap } from './components/AiThinkingMap';
 import { GameProvider, useGame } from './context/GameContext';
+import { useTranslation } from './hooks/useTranslation';
 import { getHistoryAtTurn } from './game/history';
 import { audioManager } from './utils/audio';
 
 function GameLayout() {
   const { state, dispatch } = useGame();
+  const { t } = useTranslation();
   const {
     phase,
     difficulty,
@@ -31,16 +34,14 @@ function GameLayout() {
   const aiBoardDisplay = historyBoards?.ai ?? boardAI;
 
   const statusText = useMemo(() => {
-    if (phase === 'setup') return 'Place your fleet or randomize to begin the skirmish.';
-    if (phase === 'playerTurn') return 'Your turn — pick a square on the outlaw waters.';
-    if (phase === 'aiTurn') return aiThinking ? 'Outlaw AI lining up a shot…' : 'Outlaw turn.';
+    if (phase === 'setup') return t('status.placeFleet');
+    if (phase === 'playerTurn') return t('status.yourTurn');
+    if (phase === 'aiTurn') return aiThinking ? t('status.aiThinking') : t('status.aiTurn');
     if (phase === 'finished') {
-      return winner === 'player'
-        ? 'You branded every outlaw ship. Victory is yours!'
-        : 'The outlaws sank your herd. Tip your hat and try again.';
+      return winner === 'player' ? t('status.victory') : t('status.defeat');
     }
     return '';
-  }, [phase, aiThinking, winner]);
+  }, [phase, aiThinking, winner, t]);
 
   const aiTargetHints = useMemo(
     () => new Set(aiMemory.targetQueue.map(coord => `${coord.x},${coord.y}`)),
@@ -49,10 +50,10 @@ function GameLayout() {
 
   const lastEntry = history[history.length - 1];
   const lastSummary = lastEntry
-    ? `${lastEntry.shooter === 'player' ? 'You' : 'AI'} targeted ${String.fromCharCode(65 + lastEntry.target.y)}${
+    ? `${lastEntry.shooter === 'player' ? t('status.you') : t('status.ai')} targeted ${String.fromCharCode(65 + lastEntry.target.y)}${
         lastEntry.target.x + 1
-      } (${lastEntry.result}${lastEntry.sunk ? `, sunk ${lastEntry.shipId}` : ''})`
-    : 'No shots yet — saddle up!';
+      } (${t(`status.${lastEntry.result}` as any)}${lastEntry.sunk ? `, ${t('status.sunk')} ${lastEntry.shipId}` : ''})`
+    : t('status.noShots');
 
   // Track previous history length to detect new shots
   const prevHistoryLengthRef = useRef(history.length);
@@ -134,21 +135,21 @@ function GameLayout() {
       <header className="app-header">
         <div className="hero-content">
           <div className="hero-badge">
-            <span>⚔️ WESTERN NAVAL WARFARE ⚔️</span>
+            <span>{t('hero.badge')}</span>
           </div>
           <h1 className="hero-title">
-            <span className="hero-title__main">Cattle</span>
-            <span className="hero-title__accent">Clash</span>
+            <span className="hero-title__main">{t('hero.title.main')}</span>
+            <span className="hero-title__accent">{t('hero.title.accent')}</span>
           </h1>
           <p className="hero-subtitle">
-            Battleship on the open range — rustle up those outlaws.
+            {t('hero.subtitle')}
           </p>
           <div className="hero-actions">
             <button className="hero-cta hero-cta--primary" onClick={handleQuickDraw}>
-              {phase !== 'setup' ? '⚡ New Battle' : '🤠 Quick Draw'}
+              {phase !== 'setup' ? t('hero.newBattle') : t('hero.quickDraw')}
             </button>
             <button className="hero-cta hero-cta--secondary" onClick={toggleHistory}>
-              {isHistoryOpen ? '📋 Hide Battle Log' : `📋 Cattle Drive Log (${history.length})`}
+              {isHistoryOpen ? t('hero.hideBattleLog') : `${t('hero.cattleDriveLog')} (${history.length})`}
             </button>
           </div>
         </div>
@@ -166,30 +167,31 @@ function GameLayout() {
             onChange={handleDifficultyChange}
             disabled={phase !== 'setup'}
           />
+          <LanguageToggle />
           <button className="belt-buckle" type="button" onClick={handleNewGame}>
-            New showdown
+            {t('controls.newShowdown')}
           </button>
           <button className="belt-buckle" type="button" onClick={toggleHistory}>
-            {isHistoryOpen ? 'Hide cattle drive log' : `Cattle drive log (${history.length})`}
+            {isHistoryOpen ? t('controls.hideCattleDriveLog') : `${t('controls.cattleDriveLog')} (${history.length})`}
           </button>
           <button 
             className="belt-buckle belt-buckle--ghost" 
             type="button" 
             onClick={() => setAudioEnabled(!audioEnabled)}
-            aria-label={audioEnabled ? 'Mute audio' : 'Unmute audio'}
+            aria-label={audioEnabled ? t('controls.muteAudio') : t('controls.unmuteAudio')}
           >
-            {audioEnabled ? '🔊 Audio On' : '🔇 Audio Off'}
+            {audioEnabled ? t('controls.audioOn') : t('controls.audioOff')}
           </button>
         </div>
         <div className="status-banner">
           <div>
             <p>{statusText}</p>
             <p className="status-subtext" aria-live="polite">
-              {viewingHistory ? `Viewing turn ${historyCursor}` : lastSummary}
+              {viewingHistory ? t('status.viewingTurn', { turn: String(historyCursor) }) : lastSummary}
             </p>
           </div>
           <span aria-live="polite">
-            {viewingHistory ? 'History view active' : `Turns recorded: ${history.length}`}
+            {viewingHistory ? t('status.historyActive') : t('status.turnsRecorded', { count: String(history.length) })}
           </span>
         </div>
       </section>
@@ -197,23 +199,23 @@ function GameLayout() {
       {phase === 'setup' ? (
         <FleetSetup />
       ) : (
-        <section id="arena" className="board-layout" aria-label="Battlefield">
-          <div className="panel" aria-label="Your ranch grid">
-            <h2>Ranch</h2>
+        <section id="arena" className="board-layout" aria-label={t('board.battlefield')}>
+          <div className="panel" aria-label={t('board.yourRanchGrid')}>
+            <h2>{t('board.ranch')}</h2>
             <BoardGrid
               board={playerBoardDisplay}
               mode="player"
-              ariaLabel="Player ranch grid"
+              ariaLabel={t('board.playerRanchGrid')}
               highlightTargets={viewingHistory ? undefined : aiTargetHints}
               disabled={viewingHistory}
             />
           </div>
-          <div className="panel" aria-label="Outlaw waters grid">
-            <h2>Outlaw Waters</h2>
+          <div className="panel" aria-label={t('board.outlawWatersGrid')}>
+            <h2>{t('board.outlawWaters')}</h2>
             <BoardGrid
               board={aiBoardDisplay}
               mode="enemy"
-              ariaLabel="Outlaw grid"
+              ariaLabel={t('board.outlawGrid')}
               onSelectCell={handlePlayerFire}
               disabled={viewingHistory || phase !== 'playerTurn' || Boolean(winner)}
             />
@@ -222,13 +224,13 @@ function GameLayout() {
       )}
 
       <section id="log" className="panel history-panel" hidden={!isHistoryOpen} aria-hidden={!isHistoryOpen}>
-        <h2>Cattle Drive Log</h2>
+        <h2>{t('history.heading')}</h2>
         <p className="panel-footer" aria-live="polite">
           {phase === 'setup'
-            ? 'History will fill in once the showdown starts. Place your ships to begin.'
+            ? t('history.setupMessage')
             : history.length === 0
-              ? 'No shots have been fired yet — take aim to rustle up entries.'
-              : `Logged turns: ${history.length}`}
+              ? t('history.noShots')
+              : t('history.loggedTurns', { count: String(history.length) })}
         </p>
         <ol className="history-list">
           {history.map(entry => (
@@ -237,9 +239,9 @@ function GameLayout() {
               className={`history-entry${historyCursor === entry.turn ? ' history-entry--active' : ''}`}
             >
               <div>
-                <strong>Turn {entry.turn}:</strong> {entry.shooter === 'player' ? 'You' : 'AI'} →
-                ({String.fromCharCode(65 + entry.target.y)}{entry.target.x + 1}) — {entry.result}
-                {entry.sunk ? `, sunk ${entry.shipId}` : ''}
+                <strong>{t('history.turn', { turn: String(entry.turn) })}</strong> {entry.shooter === 'player' ? t('status.you') : t('status.ai')} →
+                ({String.fromCharCode(65 + entry.target.y)}{entry.target.x + 1}) — {t(`status.${entry.result}` as any)}
+                {entry.sunk ? `, ${t('status.sunk')} ${entry.shipId}` : ''}
               </div>
               <button
                 type="button"
@@ -248,7 +250,7 @@ function GameLayout() {
                 aria-pressed={historyCursor === entry.turn}
                 disabled={phase === 'setup'}
               >
-                View
+                {t('history.view')}
               </button>
             </li>
           ))}
@@ -259,23 +261,23 @@ function GameLayout() {
             className="belt-buckle belt-buckle--ghost"
             onClick={() => dispatch({ type: 'SET_HISTORY_CURSOR', payload: { turn: null } })}
           >
-            Return to live battle
+            {t('history.returnToLive')}
           </button>
         )}
       </section>
 
       {phase === 'finished' && (
-        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="Game result">
+        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label={t('modal.gameResult')}>
           <div className="modal-panel">
-            <h2>{winner === 'player' ? 'Victory!' : 'Defeat!'}</h2>
+            <h2>{winner === 'player' ? t('modal.victory') : t('modal.defeat')}</h2>
             <p>
               {winner === 'player'
-                ? 'You sent those bandits packing. Fancy another round?'
-                : 'The outlaws seized your herd this round. Saddle up and try again.'}
+                ? t('modal.victoryMessage')
+                : t('modal.defeatMessage')}
             </p>
             <div className="modal-actions">
               <button className="belt-buckle" type="button" onClick={handleNewGame}>
-                New showdown
+                {t('modal.newShowdown')}
               </button>
             </div>
           </div>
