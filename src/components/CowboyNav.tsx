@@ -8,9 +8,6 @@ export function CowboyNav({ onQuickDraw }: CowboyNavProps) {
   const { t } = useTranslation();
   
   const navLinks = [
-    { label: t('nav.arena'), href: '#arena' },
-    { label: t('nav.leaderboard'), href: '#log' },
-    { label: t('nav.posse'), href: '#fleet' },
     { label: t('nav.settings'), href: '#controls' }
   ];
   
