@@ -47,6 +47,7 @@ interface SetHistoryCursorPayload {
 export type GameAction =
   | { type: 'RESET_TO_SETUP' }
   | { type: 'SET_DIFFICULTY'; difficulty: Difficulty }
+  | { type: 'SET_LANGUAGE'; language: 'en' | 'es' }
   | { type: 'RANDOMIZE_PLAYER_FLEET'; seed?: number }
   | { type: 'SET_PLAYER_BOARD'; payload: SetBoardPayload }
   | { type: 'START_GAME'; seed?: number }
@@ -67,9 +68,21 @@ const getRemainingShips = (board: BoardState): ShipId[] =>
 function createInitialState(difficulty: Difficulty = DEFAULT_DIFFICULTY): GameState {
   const boardPlayer = createEmptyBoard(BOARD_SIZE);
   const boardAI = createEmptyBoard(BOARD_SIZE);
+  
+  const storedDifficulty = localStorage.getItem('battleship_difficulty');
+  const finalDifficulty = (storedDifficulty === 'easy' || storedDifficulty === 'medium' || storedDifficulty === 'hard')
+    ? storedDifficulty
+    : difficulty;
+  
+  const storedLanguage = localStorage.getItem('battleship_language');
+  const finalLanguage = (storedLanguage === 'en' || storedLanguage === 'es')
+    ? storedLanguage
+    : 'en';
+  
   return {
     phase: 'setup',
-    difficulty,
+    difficulty: finalDifficulty,
+    language: finalLanguage,
     boardPlayer,
     boardAI,
     aiMemory: ensureAIContext(),
@@ -94,10 +107,21 @@ function reducer(state: GameState, action: GameAction): GameState {
       if (state.phase !== 'setup' || state.difficulty === action.difficulty) {
         return state;
       }
+      localStorage.setItem('battleship_difficulty', action.difficulty);
       return {
         ...state,
         difficulty: action.difficulty,
         aiMemory: ensureAIContext()
+      };
+
+    case 'SET_LANGUAGE':
+      if (state.language === action.language) {
+        return state;
+      }
+      localStorage.setItem('battleship_language', action.language);
+      return {
+        ...state,
+        language: action.language
       };
 
     case 'RANDOMIZE_PLAYER_FLEET': {
