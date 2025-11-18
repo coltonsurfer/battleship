@@ -1,15 +1,19 @@
-const navLinks = [
-  { label: 'Arena', href: '#arena' },
-  { label: 'Leaderboard', href: '#log' },
-  { label: 'Posse', href: '#fleet' },
-  { label: 'Settings', href: '#controls' }
-];
+import { useTranslation } from '../hooks/useTranslation';
 
 interface CowboyNavProps {
   onQuickDraw?: () => void;
 }
 
 export function CowboyNav({ onQuickDraw }: CowboyNavProps) {
+  const { t } = useTranslation();
+  
+  const navLinks = [
+    { label: t('nav.arena'), href: '#arena' },
+    { label: t('nav.leaderboard'), href: '#log' },
+    { label: t('nav.posse'), href: '#fleet' },
+    { label: t('nav.settings'), href: '#controls' }
+  ];
+  
   return (
     <nav className="cowboy-nav" aria-label="Primary navigation" data-node-id="1:608">
       <div className="cowboy-nav__brand" aria-label="Cowboy Clash">
@@ -17,8 +21,8 @@ export function CowboyNav({ onQuickDraw }: CowboyNavProps) {
           ⚔
         </span>
         <div>
-          <p className="cowboy-nav__eyebrow">Cattle Clash Co.</p>
-          <p className="cowboy-nav__title">Cowboy Clash</p>
+          <p className="cowboy-nav__eyebrow">{t('nav.brand.company')}</p>
+          <p className="cowboy-nav__title">{t('nav.brand.title')}</p>
         </div>
       </div>
 
@@ -34,7 +38,7 @@ export function CowboyNav({ onQuickDraw }: CowboyNavProps) {
       </ul>
 
       <button type="button" className="nav-cta" onClick={onQuickDraw}>
-        Quick Draw
+        {t('nav.quickDraw')}
       </button>
     </nav>
   );

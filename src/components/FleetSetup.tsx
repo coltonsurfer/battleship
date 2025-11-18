@@ -4,6 +4,7 @@ import { DEFAULT_SHIPS, SHIP_DEFS } from '../game/constants';
 import { placeShip, removeShip } from '../game/engine';
 import type { Coordinate, Orientation, ShipId } from '../game/types';
 import { useGame } from '../context/GameContext';
+import { useTranslation } from '../hooks/useTranslation';
 import { BoardGrid } from './BoardGrid';
 
 export function FleetSetup() {
@@ -11,6 +12,7 @@ export function FleetSetup() {
     state: { boardPlayer, placementOrder },
     dispatch
   } = useGame();
+  const { t } = useTranslation();
 
   const [orientation, setOrientation] = useState<Orientation>('horizontal');
   const [activeShip, setActiveShip] = useState<ShipId | null>(null);
@@ -117,20 +119,20 @@ export function FleetSetup() {
   const isReady = boardPlayer.ships.length === DEFAULT_SHIPS.length;
 
   return (
-    <div id="fleet" className="panel" aria-label="Fleet placement" role="region">
+    <div id="fleet" className="panel" aria-label={t('fleet.fleetPlacement')} role="region">
       <header>
-        <h2>Ranch Setup</h2>
+        <h2>{t('fleet.heading')}</h2>
         <p className="header-subtitle">
-          Select a ship, then click the grid to place it. Click on placed ships to select them for rotation. Tap the rotate button or press <kbd>R</kbd>.
+          {t('fleet.instructions')} <kbd>R</kbd>.
         </p>
       </header>
 
-      <div className="control-bar" role="group" aria-label="Placement controls">
+      <div className="control-bar" role="group" aria-label={t('fleet.placementControls')}>
         <button className="belt-buckle" onClick={handleRandomize} type="button">
-          Randomize herd
+          {t('fleet.randomizeHerd')}
         </button>
         <button className="belt-buckle" onClick={handleRotate} type="button">
-          Rotate ({orientation === 'horizontal' ? '↔' : '↕'})
+          {t('fleet.rotate')} ({orientation === 'horizontal' ? '↔' : '↕'})
         </button>
         <button
           className="belt-buckle"
@@ -138,7 +140,7 @@ export function FleetSetup() {
           onClick={handleStart}
           disabled={!isReady}
         >
-          Start showdown
+          {t('fleet.startShowdown')}
         </button>
       </div>
 
@@ -147,17 +149,18 @@ export function FleetSetup() {
           <BoardGrid
             board={boardPlayer}
             mode="player"
-            ariaLabel="Player ranch"
+            ariaLabel={t('fleet.playerRanch')}
             onSelectCell={handlePlaceShip}
           />
         </div>
 
         <aside>
-          <h3>Remaining herd</h3>
+          <h3>{t('fleet.remainingHerd')}</h3>
           <ul className="fleet-list">
             {DEFAULT_SHIPS.map(ship => {
               const placed = boardPlayer.ships.some(s => s.shipId === ship.id);
               const isSelected = activeShip === ship.id || (!activeShip && shipToPlace === ship.id);
+              const shipName = t(`ship.${ship.id}` as any);
               return (
                 <li key={ship.id}>
                   <button
@@ -166,7 +169,7 @@ export function FleetSetup() {
                     aria-pressed={isSelected}
                     onClick={() => setActiveShip(ship.id)}
                   >
-                    {ship.displayName} {placed ? '✓' : ''}
+                    {shipName} ({ship.length}) {placed ? '✓' : ''}
                   </button>
                   {placed && (
                     <button
@@ -174,7 +177,7 @@ export function FleetSetup() {
                       type="button"
                       onClick={() => handleClear(ship.id)}
                     >
-                      Remove
+                      {t('fleet.remove')}
                     </button>
                   )}
                 </li>
