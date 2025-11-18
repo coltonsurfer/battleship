@@ -114,6 +114,7 @@ export const translations = {
     'modal.newShowdown': 'New showdown',
     'modal.gameResult': 'Game result',
     
+    'language.label': 'Language selection',
     'language.toggle': 'Language',
     'language.english': 'English',
     'language.spanish': 'Español'
@@ -233,6 +234,7 @@ export const translations = {
     'modal.newShowdown': 'Nuevo enfrentamiento',
     'modal.gameResult': 'Resultado del juego',
     
+    'language.label': 'Selección de idioma',
     'language.toggle': 'Idioma',
     'language.english': 'English',
     'language.spanish': 'Español'
@@ -243,7 +245,7 @@ export type TranslationKey = keyof typeof translations.en;
 export type Language = 'en' | 'es';
 
 export function translate(key: TranslationKey, lang: Language, params?: Record<string, string | number>): string {
-  let text = translations[lang][key] || translations.en[key] || key;
+  let text: string = translations[lang][key] || translations.en[key] || key;
   
   if (params) {
     Object.entries(params).forEach(([paramKey, value]) => {

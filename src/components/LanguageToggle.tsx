@@ -8,7 +8,7 @@ export function LanguageToggle() {
   const { language } = state;
 
   const handleLanguageChange = (newLanguage: Language) => {
-    dispatch({ type: 'SET_LANGUAGE', payload: { language: newLanguage } });
+    dispatch({ type: 'SET_LANGUAGE', language: newLanguage });
   };
 
   return (
